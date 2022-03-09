@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: src
+      dockerfile: Dockerfile
+    container_name: movie-app
+    image: bogusrj/movies:latest
+    ports:
+      - 5000:5000
+    networks:
+      - movies_network
+    depends_on:
+      - movie-service
+      - review-service
+    environment:
+      MOVIE_SERVICE_URI: http://movie-service:8181
+      REVIEW_SERVICE_URI: http://review-service
+
+  movie-service:
+    build:
+      context: ../movie/src
+      dockerfile: Dockerfile
+    container_name: movie-service
+    image: bogusrj/movies:latest
+    ports:
+      - 8181:8181
+    networks:
+      - movies_network
+    depends_on:
+      - mongodb
+    environment:
+      MONGODB_URI: mongodb://mongouser:mongopwd@mongodb:27017/admin
+
+  review-service:
+    build:
+      context: ../review/src
+      dockerfile: Dockerfile
+    container_name: review-service
+    image: bogusrj/review:latest
+    ports:
+      - 80:80
+    networks:
+      - movies_network
+    depends_on:
+      - postgresdb
+    environment:
+      ConnectionStrings__MyConnection: Host=postgresdb-movies;Database=review;Username=pguser;Password=Pg@123;
+
+  mongodb:
+    image: mongo:5.0.5
+    container_name: mongodb
+    ports: 
+      - 27017:27017
+    networks:
+      - movies_network
+    volumes:
+      - mongodb_movie_vol:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongouser
+      - MONGO_INITDB_ROOT_PASSWORD=mongopwd
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongo 127.0.0.1:27017/test --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  postgresdb:
+    container_name: postgresdb-movies
+    image: postgres:14.1-alpine
+    ports: 
+      - 5432:5432
+    networks:
+      - movies_network
+    volumes:
+      - postgresdb_movie_vol:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: pguser
+      POSTGRES_PASSWORD: Pg@123
+      POSTGRES_DB: review
+
+volumes:
+  mongodb_movie_vol:
+  postgresdb_movie_vol:
+
+networks:
+  movies_network:
+    driver: bridge

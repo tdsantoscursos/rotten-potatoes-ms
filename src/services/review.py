@@ -5,7 +5,7 @@ import os
 class ReviewService:
 
     def __init__(self):
-        self.base_url = os.getenv("REVIEW_SERVICE_URI", "http://localhost:8282")
+        self.base_url = os.getenv("REVIEW_SERVICE_URI", "http://review-service")
 
     def get_reviews(self, idObj):
         response = requests.get(self.base_url + '/api/review/' + idObj)

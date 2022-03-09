@@ -5,7 +5,7 @@ import os
 class MovieService:
 
     def __init__(self):
-        self.base_url = os.getenv("MOVIE_SERVICE_URI", "http://localhost:8181")
+        self.base_url = os.getenv("MOVIE_SERVICE_URI", "http://movie-service:8181")
 
     def get_movies(self):
         response = requests.get(self.base_url + '/api/movie')
