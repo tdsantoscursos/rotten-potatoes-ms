@@ -6,7 +6,7 @@ services:
       context: src
       dockerfile: Dockerfile
     container_name: movie-app
-    image: bogusrj/movies:latest
+    image: bogusrj/movies:v2
     ports:
       - 5000:5000
     networks:
@@ -23,7 +23,7 @@ services:
       context: ../movie/src
       dockerfile: Dockerfile
     container_name: movie-service
-    image: bogusrj/movies:latest
+    image: bogusrj/movies:v2
     ports:
       - 8181:8181
     networks:
@@ -38,9 +38,9 @@ services:
       context: ../review/src
       dockerfile: Dockerfile
     container_name: review-service
-    image: bogusrj/review:latest
+    image: bogusrj/service-reviews:v1
     ports:
-      - 80:80
+      - 8282:80
     networks:
       - movies_network
     depends_on:
