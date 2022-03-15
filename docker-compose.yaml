@@ -6,7 +6,7 @@ services:
       context: src
       dockerfile: Dockerfile
     container_name: movie-app
-    image: bogusrj/movies:v2
+    image: bogusrj/movie-app:latest
     ports:
       - 5000:5000
     networks:
